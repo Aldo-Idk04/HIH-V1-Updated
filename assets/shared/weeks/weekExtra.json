@@ -1,0 +1,27 @@
+{
+	"songs": [
+		["Creepy-pasta","sans-aftermatch",[57,49,119]],
+		["Jupo-Mania","sans-aftermatch",[57,49,119]],
+		["erasure","sans-aftermatch",[57,49,119]],
+		["Your-god","sans-aftermatch",[57,49,119]]
+	],
+	"hiddenUntilUnlocked": false,
+	"hideFreeplay": false,
+	"weekBackground": "judgement",
+	"difficulties": "easy, normal, hard,",
+	"weekCharacters": [
+		"",
+		"",
+		""
+	],
+	"storyName": "FND",
+	"weekName": "FND",
+	"freeplayColor": [
+		57,
+		49,
+		119
+	],
+	"hideStoryMode": false,
+	"weekBefore": "tutorial",
+	"startUnlocked": true
+}
