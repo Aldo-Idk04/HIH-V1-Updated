@@ -1,0 +1,30 @@
+{
+	"songs": [
+		["To-The-Ruins","sans-aftermatch",[57,49,119]],
+		["Escape-The-Ruins","sans",[50,43,533]],
+		["Macabre-Meetin","sans-aftermatch",[57,49,119]],
+		["Blood-N-Bones","sans-aftermatch",[57,49,119]],
+		["Flesh-Fracture","sans-aftermatch",[57,49,119]],
+		["Goretrousle","sans-aftermatch",[57,49,119]],
+		["Slashers-Feast","sans-aftermatch",[57,49,119]]
+	],
+	"hiddenUntilUnlocked": false,
+	"hideFreeplay": false,
+	"weekBackground": "judgement",
+	"difficulties": "easy, normal, hard,",
+	"weekCharacters": [
+		"",
+		"",
+		""
+	],
+	"storyName": "FND",
+	"weekName": "FND",
+	"freeplayColor": [
+		57,
+		49,
+		119
+	],
+	"hideStoryMode": false,
+	"weekBefore": "tutorial",
+	"startUnlocked": true
+}

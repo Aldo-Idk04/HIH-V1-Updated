@@ -448,9 +448,11 @@ class PlayState extends MusicBeatState
 				#end
 			}
 		#end
-
+		//new FunkinLua(File.getContent("assets/scripts/CameraHandler.lua"));
+		//initHScript(File.getContent("assets/scripts/CameraFix.hx"));
 		new FunkinLua(openfl.utils.Assets.getText("assets/scripts/CameraHandler.lua"));
-		initHScript(openfl.utils.Assets.getText("assets/scripts/CameraFix.hx").toString());
+		new FunkinLua(openfl.utils.Assets.getText("assets/scripts/doubleNotes.lua"));
+		initHScript(openfl.utils.Assets.getText("assets/scripts/CameraFix.hx"));
 			
 		var camPos:FlxPoint = FlxPoint.get(girlfriendCameraOffset[0], girlfriendCameraOffset[1]);
 		if(gf != null)
