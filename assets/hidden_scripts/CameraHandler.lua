@@ -1,7 +1,8 @@
 --Custom options
 local blockMovement = false
-local canAngle = true
+local canAngle = false
 local pixelsToMove = 15
+
 local notesChar = {
     ['boyfriend'] = {''},
     ['dad'] = {''},
@@ -9,8 +10,16 @@ local notesChar = {
     ['extra'] = {'No Animation','Extra sings too'}
 }
 
---This will get override so it doesn't matter if you change it
+--This gets overriden so it doesn't matter if you change it
 local timeToReset
+
+--Do not change unless you know what you're doing
+setVar('blockMovement', blockMovement)
+setVar('canAngle', canAngle)
+
+function onStartCountdown()
+    setVar('duetCamera', {(getMidpointX("boyfriend") - getMidpointX('dad')) / 2 , getMidpointY('dad'), getProperty('defaultCamZoom') - 0.05})
+end
 
 function goodNoteHit(i, d, t, s)
     moveTargetOffset(i, d, t)
@@ -25,30 +34,28 @@ function moveTargetOffset(i, d, t)
     if getProperty('notes.members['..i..'].gfNote') then
         char = 'gf'
     end
-    if blockMovement or d == nil or char == nil then
+    if getVar('blockMovement') or d == nil or char == nil then
         cancelTimer('resetTargetOffset')
         onTimerCompleted('resetTargetOffset')
         return
     end
     timeToReset = stepCrochet * (0.0011 / getPropertyFromClass("flixel.FlxG", "sound.music.pitch")) * getProperty(char..".singDuration")
+    local moveX, moveY = 0, 0
     if d == 0 or d == 3 then
-        callMethod('camGame.targetOffset.set',{d == 3 and pixelsToMove or -pixelsToMove, 0})
-        if canAngle then
-            doTweenAngle('angleCamera','camGame', (d == 3 and pixelsToMove or -pixelsToMove) * 0.01, timeToReset, 'quintOut')
-        end
+        moveX = d == 3 and pixelsToMove or -pixelsToMove
     else
-        callMethod('camGame.targetOffset.set',{0, d == 1 and pixelsToMove or -pixelsToMove})
-        if canAngle then
-            doTweenAngle('angleCamera','camGame',0, timeToReset, 'quintOut')
-        end
+        moveY = d == 1 and pixelsToMove or -pixelsToMove
+    end
+    callMethod('camGame.targetOffset.set',{moveX, moveY})
+    if canAngle then
+        doTweenAngle('angleCamera','camGame',moveX * 0.01, timeToReset, 'quintOut')
     end
     runTimer('resetTargetOffset', timeToReset)
 end
 
 function onTimerCompleted(t)
     if t == 'resetTargetOffset' then
-        setProperty('camGame.targetOffset.x', 0)
-        setProperty('camGame.targetOffset.y', 0)
+        callMethod('camGame.targetOffset.set',{0, 0})
         if canAngle then
             doTweenAngle('angleCamera','camGame',0, timeToReset, 'quintOut')
         end
@@ -57,9 +64,9 @@ end
 
 function onEvent(n,v1,v2)
     if n == 'Block Camera Movement' then
-        blockMovement = not blockMovement
+        setVar('blockMovement', not getVar('blockMovement'))
     elseif n == 'Block Angle' then
-        canAngle = not canAngle
+        setVar('canAngle', not getVar('canAngle'))
     elseif n == 'Duet Section' then
         if not getProperty('camZooming') then
             setProperty('camZooming', true)
@@ -73,13 +80,10 @@ function onEvent(n,v1,v2)
                 destination = 'gf'
             end
             cameraSetTarget(destination)
-            startTween('tweenDuet','game',{defaultCamZoom = getVar('duetCamera')[3] + 0.05}, v1, {ease = 'sineInOut', onUpdate = 'updateCamZoom'})
+            startTween('tweenDuet','game',{defaultCamZoom = getVar('duetCamera')[3] + 0.05}, v1, {ease = 'quintInOut', onUpdate = 'updateCamZoom'})
         else
-            if getVar('duetCamera') == nil then
-                setVar('duetCamera', {(getMidpointX("boyfriend") - getMidpointX('dad')) / 2 , 400, getProperty('defaultCamZoom') - 0.05})
-            end
             callMethod('camFollow.setPosition',{getVar('duetCamera')[1], getVar('duetCamera')[2]})
-            startTween('tweenDuet','game',{defaultCamZoom = getVar('duetCamera')[3]}, v1, {ease = 'sineInOut', onUpdate = 'updateCamZoom'})
+            startTween('tweenDuet','game',{defaultCamZoom = getVar('duetCamera')[3]}, v1, {ease = 'quintInOut', onUpdate = 'updateCamZoom'})
         end
         if v2 ~= nil and v2 ~= '' then
             cancelTween('tweenDuet')
@@ -92,6 +96,15 @@ function onEvent(n,v1,v2)
         end
         setProperty('isCameraOnForcedPos', not getProperty('isCameraOnForcedPos'))
     end
+end
+
+function findBannedNote(t)
+    for i,v in ipairs(banNotes) do
+        if v == t then
+            return true
+        end
+    end
+    return false
 end
 
 function isCompatibleCharacter(t)

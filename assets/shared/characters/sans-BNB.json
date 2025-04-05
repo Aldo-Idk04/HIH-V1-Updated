@@ -1,53 +1,53 @@
 {
 	"animations": [
 		{
-			"loop": false,
 			"offsets": [-5, 0],
+			"loop": false,
+			"fps": 24,
 			"anim": "idle",
-			"fps": 24,
-			"name": "i",
-			"indices": []
+			"indices": [],
+			"name": "i"
 		},
 		{
-			"loop": false,
 			"offsets": [110, 58],
+			"loop": false,
+			"fps": 24,
 			"anim": "singLEFT",
-			"fps": 24,
-			"name": "l",
-			"indices": []
+			"indices": [],
+			"name": "l"
 		},
 		{
-			"loop": false,
 			"offsets": [12, 30],
+			"loop": false,
+			"fps": 24,
 			"anim": "singDOWN",
-			"fps": 24,
-			"name": "d",
-			"indices": []
+			"indices": [],
+			"name": "d"
 		},
 		{
-			"loop": false,
 			"offsets": [0, 66],
-			"anim": "singUP",
+			"loop": false,
 			"fps": 24,
-			"name": "u",
-			"indices": []
+			"anim": "singUP",
+			"indices": [],
+			"name": "u"
 		},
 		{
-			"loop": false,
 			"offsets": [51, 49],
-			"anim": "singRIGHT",
+			"loop": false,
 			"fps": 24,
-			"name": "r",
-			"indices": []
+			"anim": "singRIGHT",
+			"indices": [],
+			"name": "r"
 		}
 	],
 	"vocals_file": "",
 	"no_antialiasing": false,
 	"image": "characters/BnBHorrorSans",
 	"position": [0, 140],
-	"healthicon": "sans",
+	"healthicon": "sans-BNB",
 	"flip_x": false,
-	"healthbar_colors": [49, 176, 209],
+	"healthbar_colors": [165, 87, 104],
 	"camera_position": [-50, -150],
 	"sing_duration": 4,
 	"scale": 1.2,

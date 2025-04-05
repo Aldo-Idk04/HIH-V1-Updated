@@ -1820,12 +1820,15 @@ class FunkinLua {
 		}
 
 		var foldersToCheck:Array<String> = [Paths.getSharedPath('shaders/')];
-		/*if(Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
+		#if MODS_ALLOWED
+		foldersToCheck.push(Paths.mods('shaders/'));
+		if(Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0)
 			foldersToCheck.insert(0, Paths.mods(Mods.currentModDirectory + '/shaders/'));
 
 		for(mod in Mods.getGlobalMods())
 			foldersToCheck.insert(0, Paths.mods(mod + '/shaders/'));
-		*/
+		#end
+
 		for (folder in foldersToCheck)
 		{
 			if(FileSystem.exists(folder))

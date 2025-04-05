@@ -58,6 +58,7 @@ local chars = {
             solidColor = false,
             moveGhost = false,
             instantMove = false,
+            comeChar = false,
             scaleGhost = false,
             instantScale = false,
             enabled = true
@@ -81,6 +82,7 @@ local chars = {
                 solidColor = false,
                 moveGhost = false,
                 instantMove = false,
+                comeChar = false,
                 scaleGhost = false,
                 instantScale = false,
                 enabled = true
@@ -103,6 +105,7 @@ local chars = {
             solidColor = false,
             moveGhost = false,
             instantMove = false,
+            comeChar = false,
             scaleGhost = false,
             instantScale = false,
             enabled = true
@@ -123,6 +126,7 @@ local chars = {
             solidColor = false,
             moveGhost = false,
             instantMove = false,
+            comeChar = false,
             scaleGhost = false,
             instantScale = false,
             enabled = true
@@ -143,6 +147,7 @@ local chars = {
             solidColor = false,
             moveGhost = false,
             instantMove = false,
+            comeChar = false,
             scaleGhost = false,
             instantScale = false,
             enabled = true
@@ -369,14 +374,50 @@ function createGhost(char,d,anim)
                 setProperty(tag..'.x', getProperty(char..'.x') + (moveTo))
             end
         else
+            --[[local finalMove = moveTo
+            if d == 0 or d == 3 then
+                finalMove = getProperty(char..'.x') + (d == 0 and -moveTo or moveTo)
+            else
+                finalMove = getProperty(char..'.y') + (d == 1 and moveTo or -moveTo)
+            end
+            if chars[char]['effects'].comeChar then
+                callMethod(tag..'.setPosition',{getProperty(char..'.x') + getRandomFloat(-moveTo, moveTo), getProperty(char..'.y') + getRandomFloat(-moveTo, moveTo)})
+                if d == 0 or d == 3 then
+                    finalMove = getProperty(char..'.x')
+                else
+                    finalMove = getProperty(char..'.y')
+                end
+            end
             if d == 0 then
-                doTweenX(tag.."move", tag, getProperty(char..'.x') + (-moveTo), tweensDuration.move,tweensType.move)
+                doTweenX(tag.."move", tag, finalMove, tweensDuration.move,tweensType.move)
             elseif d == 1 then
-                doTweenY(tag.."move", tag, getProperty(char..'.y') + moveTo, tweensDuration.move,tweensType.move)
+                doTweenY(tag.."move", tag, finalMove, tweensDuration.move,tweensType.move)
             elseif d == 2 then
-                doTweenY(tag.."move", tag, getProperty(char..'.y') + (-moveTo), tweensDuration.move,tweensType.move)
+                doTweenY(tag.."move", tag, finalMove, tweensDuration.move,tweensType.move)
             elseif d == 3 then
-                doTweenX(tag.."move", tag, getProperty(char..'.x') + (moveTo), tweensDuration.move,tweensType.move)
+                doTweenX(tag.."move", tag, finalMove, tweensDuration.move,tweensType.move)
+            end--]]
+            local axisMap = {
+                [0] = {property = '.x', multiplier = -1},
+                [1] = {property = '.y', multiplier = 1},  
+                [2] = {property = '.y', multiplier = -1}, 
+                [3] = {property = '.x', multiplier = 1} 
+            }
+            
+            local axis = axisMap[d]
+            if axis then
+                local finalMove = getProperty(char .. axis.property) + (moveTo * axis.multiplier)
+            
+                if chars[char]['effects'].comeChar then
+                    callMethod(tag .. '.setPosition', {
+                        getProperty(char .. '.x') + getRandomFloat(-moveTo, moveTo),
+                        getProperty(char .. '.y') + getRandomFloat(-moveTo, moveTo)
+                    })
+                    finalMove = getProperty(char .. axis.property)
+                end
+            
+                local tweenFunction = axis.property == '.x' and doTweenX or doTweenY
+                tweenFunction(tag .. "move", tag, finalMove, tweensDuration.move, tweensType.move)
             end
         end
     end

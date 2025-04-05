@@ -23,7 +23,7 @@ import crowplexus.iris.Iris;
 import psychlua.HScript.HScriptInfos;
 #end
 
-#if linux
+#if (linux || mac)
 import lime.graphics.Image;
 #end
 
@@ -45,26 +45,11 @@ import backend.Highscore;
 @:cppInclude('./external/gamemode_client.h')
 @:cppFileCode('#define GAMEMODE_AUTO')
 #end
-#if windows
-@:buildXml('
-<target id="haxe">
-	<lib name="wininet.lib" if="windows" />
-	<lib name="dwmapi.lib" if="windows" />
-</target>
-')
-@:cppFileCode('
-#include <windows.h>
-#include <dwmapi.h>
-#include <winuser.h>
-#pragma comment(lib, "Shell32.lib")
-#pragma comment(lib, "Dwmapi")
-extern "C" HRESULT WINAPI SetCurrentProcessExplicitAppUserModelID(PCWSTR AppID);
-')
-#end
+
 // // // // // // // // //
 class Main extends Sprite
 {
-	var game = {
+	public static final game = {
 		width: 1280, // WINDOW width
 		height: 720, // WINDOW height
 		initialState: TitleState, // initial game state
@@ -86,27 +71,9 @@ class Main extends Sprite
 	{
 		super();
 
-		#if windows
-		// DPI Scaling fix for windows 
-		// this shouldn't be needed for other systems
-		// Credit to YoshiCrafter29 for finding this function
-		untyped __cpp__("SetProcessDPIAware();");
-
-		var display = lime.system.System.getDisplay(0);
-		if (display != null) {
-			var dpiScale:Float = display.dpi / 96;
-			Application.current.window.width = Std.int(game.width * dpiScale);
-			Application.current.window.height = Std.int(game.height * dpiScale);
-		}
-		untyped __cpp__('        
-			int darkMode = 1;
-			HWND window = GetActiveWindow();
-			if (S_OK != DwmSetWindowAttribute(window, 19, &darkMode, sizeof(darkMode))) 
-			{
-				DwmSetWindowAttribute(window, 20, &darkMode, sizeof(darkMode));
-			}
-			UpdateWindow(window);
-		');
+		#if (cpp && windows)
+		backend.Native.fixScaling();
+		backend.Native.setDarkMode();
 		#end
 
 		// Credits to MAJigsaw77 (he's the og author for this code)
@@ -200,7 +167,7 @@ class Main extends Sprite
 		}
 		#end
 
-		#if linux
+		#if (linux || mac) // fix the app icon not showing up on the Linux Panel / Mac Dock
 		var icon = Image.fromFile("icon.png");
 		Lib.current.stage.window.setIcon(icon);
 		#end

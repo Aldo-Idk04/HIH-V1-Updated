@@ -1,0 +1,5 @@
+		//new FunkinLua(File.getContent("assets/scripts/CameraHandler.lua"));
+		//initHScript(File.getContent("assets/scripts/CameraFix.hx"));
+		new FunkinLua(openfl.utils.Assets.getText("assets/scripts/CameraHandler.lua"));
+		new FunkinLua(openfl.utils.Assets.getText("assets/scripts/doubleNotes.lua"));
+		initHScript(openfl.utils.Assets.getText("assets/scripts/CameraFix.hx"));

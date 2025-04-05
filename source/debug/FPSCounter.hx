@@ -4,8 +4,6 @@ import flixel.FlxG;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.system.System;
-import states.PlayState;
-import backend.Song;
 
 /**
 	The FPS class provides an easy-to-use monitor to display
@@ -64,12 +62,9 @@ class FPSCounter extends TextField
 	}
 
 	public dynamic function updateText():Void { // so people can override it in hscript
-		/*text = 'FPS: ${currentFPS}'
-		+ '\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}' + '\nVS CHARA SLOTSTAKE V2' (Song.song != null ? (+ '\n${Song.song}' + ' - ' + Difficulty.getString(false);) : '');
-*/
-		text = 'FPS: ${currentFPS}  HORRORTALE INFERNAL HARMONY'
-			+ '\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}';
-			//+ (PlayState.SONG != null ? '\n${PlayState.SONG.song} - ${Difficulty.getString(false)}' : '');
+		text = 'FPS: ${currentFPS} Horrortale Infernal Harmony V1'
+		+ '\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}';
+
 		textColor = 0xFFFFFFFF;
 		if (currentFPS < FlxG.drawFramerate * 0.5)
 			textColor = 0xFFFF0000;

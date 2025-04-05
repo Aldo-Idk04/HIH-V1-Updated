@@ -4859,7 +4859,6 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			}
 		}
 
-		#if MODS_ALLOWED
 		for (directory in Mods.directoriesWithFile(Paths.getSharedPath(), mainFolder))
 		{
 			for (file in FileSystem.readDirectory(directory))
@@ -4875,23 +4874,6 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 							fileList.push(fileToCheck);
 							break;
 						}
-					}
-				}
-			}
-		}
-		#end
-		for (file in FileSystem.readDirectory(Paths.getSharedPath('custom_events')))
-		{
-			var path = haxe.io.Path.join([Paths.getSharedPath('custom_events'), file.trim()]);
-			if (!FileSystem.isDirectory(path) && !file.startsWith('readme.'))
-			{
-				for (fileType in fileTypes)
-				{
-					var fileToCheck:String = file.substr(0, file.length - fileType.length);
-					if(fileToCheck.length > 0 && path.endsWith(fileType) && !fileList.contains(fileToCheck))
-					{
-						fileList.push(fileToCheck);
-						break;
 					}
 				}
 			}

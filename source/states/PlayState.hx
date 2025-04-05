@@ -30,6 +30,7 @@ import substates.PauseSubState;
 import substates.GameOverSubstate;
 
 #if !flash
+import flixel.addons.display.FlxRuntimeShader;
 import openfl.filters.ShaderFilter;
 #end
 
@@ -73,6 +74,11 @@ import crowplexus.hscript.Printer;
 **/
 class PlayState extends MusicBeatState
 {
+
+	//SHADER SHIT
+	var shaderhealthP1Txt:FlxRuntimeShader;
+	var shaderscoreTxt:FlxRuntimeShader;
+
 	public static var STRUM_X = 42;
 	public static var STRUM_X_MIDDLESCROLL = -278;
 
@@ -199,13 +205,14 @@ class PlayState extends MusicBeatState
 	public var practiceMode:Bool = false;
 	public var pressMissDamage:Float = 0.05;
 
-	public var botplaySine:Float = 0;
-	public var botplayTxt:FlxText;
-
 	public var downBlackBar:FlxSprite;
 	public var upBlackBar:FlxSprite;
 
+	public var botplaySine:Float = 0;
+	public var botplayTxt:FlxText;
+
 	public var iconP1:HealthIcon;
+	public var healthP1Txt:FlxText;
 	public var iconP2:HealthIcon;
 	public var camHUD:FlxCamera;
 	public var camGame:FlxCamera;
@@ -448,8 +455,7 @@ class PlayState extends MusicBeatState
 				#end
 			}
 		#end
-		//new FunkinLua(File.getContent("assets/scripts/CameraHandler.lua"));
-		//initHScript(File.getContent("assets/scripts/CameraFix.hx"));
+
 		new FunkinLua(openfl.utils.Assets.getText("assets/scripts/CameraHandler.lua"));
 		new FunkinLua(openfl.utils.Assets.getText("assets/scripts/doubleNotes.lua"));
 		initHScript(openfl.utils.Assets.getText("assets/scripts/CameraFix.hx"));
@@ -549,7 +555,7 @@ class PlayState extends MusicBeatState
 		moveCameraSection();
 
 		healthBar = new Bar(0, FlxG.height * (!ClientPrefs.data.downScroll ? 0.89 : 0.11), 'healthBar', function() return health, 0, 2);
-
+		
 		healthBar.bg.scale.x = 0.6;
 
 		healthBar.leftBar.scale.x = healthBar.rightBar.scale.x = 0.6;
@@ -564,7 +570,6 @@ class PlayState extends MusicBeatState
 		healthBar.scrollFactor.set();
 		healthBar.visible = !ClientPrefs.data.hideHud;
 		healthBar.alpha = ClientPrefs.data.healthBarAlpha;
-		reloadHealthBarColors();
 		uiGroup.add(healthBar);
 
 		iconP1 = new HealthIcon(boyfriend.healthIcon, true);
@@ -572,6 +577,21 @@ class PlayState extends MusicBeatState
 		iconP1.visible = !ClientPrefs.data.hideHud;
 		iconP1.alpha = ClientPrefs.data.healthBarAlpha;
 		uiGroup.add(iconP1);
+
+		healthP1Txt = new FlxText(iconP1.x + (iconP1.width * 1.75), iconP1.y + (iconP1.height * 0.75), FlxG.width, "", 20);
+		healthP1Txt.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		healthP1Txt.scrollFactor.set();
+		healthP1Txt.borderSize = 1.25;
+		healthP1Txt.visible = !ClientPrefs.data.hideHud;
+		healthP1Txt.alpha = ClientPrefs.data.healthBarAlpha;
+		healthP1Txt.angle = 5;
+		uiGroup.add(healthP1Txt);
+
+		shaderhealthP1Txt = new FlxRuntimeShader(File.getContent('assets/shared/shaders/coolGradient.frag'));
+		healthP1Txt.shader = shaderhealthP1Txt;
+		shaderhealthP1Txt.setFloatArray('gradientFrom', [1, 1, 1]);
+		shaderhealthP1Txt.setFloatArray('colorToAvoid', [0, 0, 0]);
+		shaderhealthP1Txt.setBool('isHorizontal',true);
 
 		iconP2 = new HealthIcon(dad.healthIcon, false);
 		iconP2.y = healthBar.y - 75;
@@ -585,6 +605,13 @@ class PlayState extends MusicBeatState
 		scoreTxt.borderSize = 1.25;
 		scoreTxt.visible = !ClientPrefs.data.hideHud;
 		uiGroup.add(scoreTxt);
+
+		shaderscoreTxt = new FlxRuntimeShader(File.getContent('assets/shared/shaders/coolGradient.frag'));
+		shaderscoreTxt.setFloatArray('colorToAvoid', [0, 0, 0]);
+		shaderscoreTxt.setBool('isHorizontal',true);
+		scoreTxt.shader = shaderscoreTxt;
+
+		reloadHealthBarColors();
 
 		botplayTxt = new FlxText(400, healthBar.y - 90, FlxG.width - 800, Language.getPhrase("Botplay").toUpperCase(), 32);
 		botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -741,6 +768,8 @@ class PlayState extends MusicBeatState
 	public function reloadHealthBarColors() {
 		healthBar.setColors(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]),
 			FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
+		shaderscoreTxt.setFloatArray('gradientFrom', [dad.healthColorArray[0] / 255, dad.healthColorArray[1] / 255, dad.healthColorArray[2] / 255]);
+		shaderscoreTxt.setFloatArray('gradientTo', [boyfriend.healthColorArray[0] / 255, boyfriend.healthColorArray[1] / 255, boyfriend.healthColorArray[2] / 255]);
 	}
 
 	public function addCharacterToList(newCharacter:String, type:Int) {
@@ -1185,9 +1214,15 @@ class PlayState extends MusicBeatState
 		}
 
 		var tempScore:String;
-		if(!instakillOnMiss) tempScore = Language.getPhrase('score_text', 'Score: {1} | Misses: {2} | Rating: {3}', [songScore, songMisses, str]);
-		else tempScore = Language.getPhrase('score_text_instakill', 'Score: {1} | Rating: {2}', [songScore, str]);
+		//if(!instakillOnMiss) tempScore = Language.getPhrase('score_text', '#Score: {1}#   -   &Misses: {2}&', [songScore, songMisses, str]);
+		//else tempScore = Language.getPhrase('score_text_instakill', 'Score: {1}', [songScore, str]);
+		if(!instakillOnMiss) tempScore = Language.getPhrase('score_text', 'Score: {1}   -   Misses: {2}', [songScore, songMisses, str]);
+		else tempScore = Language.getPhrase('score_text_instakill', 'Score: {1}', [songScore, str]);
 		scoreTxt.text = tempScore;
+		/*scoreTxt.applyMarkup(scoreTxt.text,[
+			new FlxTextFormatMarkerPair(new FlxTextFormat(healthBar.leftBar.color,false,false,FlxColor.BLACK),'#'),
+			new FlxTextFormatMarkerPair(new FlxTextFormat(healthBar.rightBar.color,false,false,FlxColor.BLACK),'&')
+		]);*/
 	}
 
 	public dynamic function fullComboFunction()
@@ -1718,6 +1753,7 @@ class PlayState extends MusicBeatState
 		}
 		else FlxG.camera.followLerp = 0;
 		callOnScripts('onUpdate', [elapsed]);
+		var healthCheck:Float = healthBar.percent;
 
 		super.update(elapsed);
 
@@ -1837,8 +1873,12 @@ class PlayState extends MusicBeatState
 					if(startedCountdown)
 					{
 						var fakeCrochet:Float = (60 / SONG.bpm) * 1000;
-						notes.forEachAlive(function(daNote:Note)
+						var i:Int = 0;
+						while(i < notes.length)
 						{
+							var daNote:Note = notes.members[i];
+							if(daNote == null) continue;
+
 							var strumGroup:FlxTypedGroup<StrumNote> = playerStrums;
 							if(!daNote.mustPress) strumGroup = opponentStrums;
 
@@ -1864,7 +1904,8 @@ class PlayState extends MusicBeatState
 								daNote.active = daNote.visible = false;
 								invalidateNote(daNote);
 							}
-						});
+							if(daNote.exists) i++;
+						}
 					}
 					else
 					{
@@ -1894,6 +1935,19 @@ class PlayState extends MusicBeatState
 
 		setOnScripts('botPlay', cpuControlled);
 		callOnScripts('onUpdatePost', [elapsed]);
+
+		if(healthCheck != healthBar.percent)
+		{
+			healthP1Txt.text = "HP " + healthBar.percent + "%";
+			//healthP1Txt.text = "HP !" + healthBar.percent + "!%";
+			var colorHealth:FlxColor = 0xFFFFFF00;
+			if (healthBar.percent < 25) colorHealth = 0xFFFF0000;
+			var colorAr:Array<Float> = [255, 255, 0];
+			if (healthBar.percent < 25) colorAr = [255, 0, 0];
+			shaderhealthP1Txt.setFloatArray('gradientTo', [colorAr[0] / 255, colorAr[1] / 255, colorAr[2] / 255]);
+	
+			//healthP1Txt.applyMarkup(healthP1Txt.text, [new FlxTextFormatMarkerPair(new FlxTextFormat(colorHealth, false, false, FlxColor.BLACK), '!')]);
+		}
 	}
 
 	// Health icon updaters
@@ -2461,7 +2515,7 @@ class PlayState extends MusicBeatState
 
 		#if ACHIEVEMENTS_ALLOWED
 		var weekNoMiss:String = WeekData.getWeekFileName() + '_nomiss';
-		checkForAchievement([weekNoMiss, 'ur_bad', 'ur_good', 'hype', 'two_keys', 'toastie', 'debugger']);
+		checkForAchievement([weekNoMiss, 'ur_bad', 'ur_good', 'hype', 'two_keys', 'toastie' #if BASE_GAME_FILES, 'debugger' #end]);
 		#end
 
 		var ret:Dynamic = callOnScripts('onEndSong', null, true);
@@ -2580,6 +2634,8 @@ class PlayState extends MusicBeatState
 
 	private function popUpScore(note:Note = null):Void
 	{
+		comboGroup.alpha = 0.45;
+
 		var noteDiff:Float = Math.abs(note.strumTime - Conductor.songPosition + ClientPrefs.data.ratingOffset);
 		vocals.volume = 1;
 
@@ -2947,7 +3003,7 @@ class PlayState extends MusicBeatState
 				//subtract += 0.385; // you take more damage if playing with this gameplay changer enabled.
 				// i mean its fair :p -Crow
 				subtract *= note.tail.length + 1;
-				// i think it would be fair if damage multiplied based on how long the sustain is -Tahir
+				// i think it would be fair if damage multiplied based on how long the sustain is -[REDACTED]
 			}
 
 			if (note.missed)
@@ -3588,8 +3644,10 @@ class PlayState extends MusicBeatState
 					case 'toastie':
 						unlock = (!ClientPrefs.data.cacheOnGPU && !ClientPrefs.data.shaders && ClientPrefs.data.lowQuality && !ClientPrefs.data.antialiasing);
 
+					#if BASE_GAME_FILES
 					case 'debugger':
 						unlock = (songName == 'test' && !usedPractice);
+					#end
 				}
 			}
 			else // any FC achievements, name should be "weekFileName_nomiss", e.g: "week3_nomiss";
@@ -3606,11 +3664,12 @@ class PlayState extends MusicBeatState
 
 	#if (!flash && sys)
 	public var runtimeShaders:Map<String, Array<String>> = new Map<String, Array<String>>();
+	#end
 	public function createRuntimeShader(shaderName:String):ErrorHandledRuntimeShader
 	{
+		#if (!flash && sys)
 		if(!ClientPrefs.data.shaders) return new ErrorHandledRuntimeShader(shaderName);
 
-		#if (!flash && sys)
 		if(!runtimeShaders.exists(shaderName) && !initLuaShader(shaderName))
 		{
 			FlxG.log.warn('Shader $shaderName is missing!');
@@ -3672,5 +3731,4 @@ class PlayState extends MusicBeatState
 		#end
 		return false;
 	}
-	#end
 }
