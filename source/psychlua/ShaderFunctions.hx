@@ -21,11 +21,11 @@ class ShaderFunctions
 			return false;
 		});
 		
-		funk.addLocalCallback("setSpriteShader", function(obj:String, shader:String) {
-			if(!ClientPrefs.data.shaders) return false;
+		funk.addLocalCallback("setSpriteShader", function(obj:String, shader:String, ignore:Bool = false) {
+			if(!ClientPrefs.data.shaders && !ignore) return false;
 
 			#if (!flash && sys)
-			if(!funk.runtimeShaders.exists(shader) && !funk.initLuaShader(shader))
+			if(!funk.runtimeShaders.exists(shader) && !funk.initLuaShader(shader, ignore))
 			{
 				FunkinLua.luaTrace('setSpriteShader: Shader $shader is missing!', false, false, FlxColor.RED);
 				return false;

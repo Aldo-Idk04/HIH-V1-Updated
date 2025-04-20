@@ -1,6 +1,6 @@
 --Custom options
 local blockMovement = false
-local canAngle = false
+local canAngle = true
 local pixelsToMove = 15
 
 local notesChar = {
@@ -22,16 +22,16 @@ function onStartCountdown()
 end
 
 function goodNoteHit(i, d, t, s)
-    moveTargetOffset(i, d, t)
+    moveTargetOffset(i, d, t, true)
 end
 
 function opponentNoteHit(i, d, t, s)
-    moveTargetOffset(i, d, t)
+    moveTargetOffset(i, d, t, false)
 end
 
-function moveTargetOffset(i, d, t)
-    local char = isCompatibleCharacter(t)
-    if getProperty('notes.members['..i..'].gfNote') then
+function moveTargetOffset(i, d, t, mt)
+    local char = isCompatibleCharacter(t, mt)
+    if getProperty('notes.members['..i..'].gfNote') and char == nil then
         char = 'gf'
     end
     if getVar('blockMovement') or d == nil or char == nil then
@@ -107,11 +107,11 @@ function findBannedNote(t)
     return false
 end
 
-function isCompatibleCharacter(t)
+function isCompatibleCharacter(t, mt)
     for char, noteTypes in pairs(notesChar) do
         if getProperty(char..'.isPlayer') ~= nil then
             for _, finalType in ipairs(noteTypes) do
-                if finalType == t and mustHitSection == getProperty(char..'.isPlayer') then
+                if finalType == t and mustHitSection == mt and getProperty(char..'.isPlayer') == mt then
                     return char
                 end
             end

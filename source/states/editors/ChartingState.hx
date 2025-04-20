@@ -167,6 +167,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	var mustHitIndicator:FlxSprite;
 	var eventIcon:FlxSprite;
 	var icons:Array<HealthIcon> = [];
+	var gfName:String = '';
 
 	var events:Array<EventMetaNote> = [];
 	var notes:Array<MetaNote> = [];
@@ -670,6 +671,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	var backupLimit:Int = 10;
 
 	var lastBeatHit:Int = 0;
+
+	var executedEvents:Array<EventMetaNote> = [];
 	override function update(elapsed:Float)
 	{
 		if(!fileDialog.completed)
@@ -2297,6 +2300,11 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			Reflect.setField(characterData, 'iconP$i', data != null && data.healthicon != null ? data.healthicon : 'face');
 			Reflect.setField(characterData, 'vocalsP$i', data != null && data.vocals_file != null ? data.vocals_file : '');
 		}
+		var gfIcon:CharacterFile = loadCharacterFile(Reflect.field(PlayState.SONG, 'player3'));
+		if (gfIcon == null)
+			gfIcon = loadCharacterFile(Reflect.field(PlayState.SONG, 'gfVersion'));
+		
+		gfName = gfIcon != null && gfIcon.healthicon != null ? gfIcon.healthicon : 'gf';
 	}
 	
 	var _lastSec:Int = -1;
@@ -2320,12 +2328,16 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			var iconP1:HealthIcon = icons[0];
 			var iconP2:HealthIcon = icons[1];
 			var mustHitSection:Bool = (curSecData != null && curSecData.mustHitSection == true);
+			if (mustHitIndicator.color != 0xFFFFFFFF)
+				mustHitIndicator.color = FlxColor.WHITE;
 			if (isGfSection)
 			{
+				if (mustHitIndicator.color != 0xFFA5004D)
+					mustHitIndicator.color = 0xFFA5004D;
 				if (mustHitSection)
-					iconP1.changeIcon('gf');
+					iconP1.changeIcon(gfName);
 				else
-					iconP2.changeIcon('gf');
+					iconP2.changeIcon(gfName);
 			}
 
 			if(mustHitSection)

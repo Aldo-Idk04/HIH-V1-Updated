@@ -735,7 +735,7 @@ class CharacterEditorState extends MusicBeatState implements PsychUIEventHandler
 				reloadCharacterImage();
 				character.jsonScale = sender.value;
 				character.scale.set(character.jsonScale, character.jsonScale);
-				character.updateHitbox();
+				//character.updateHitbox();
 				updatePointerPos(false);
 				unsavedProgress = true;
 			}

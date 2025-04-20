@@ -1804,9 +1804,9 @@ class FunkinLua {
 	public var runtimeShaders:Map<String, Array<String>> = new Map<String, Array<String>>();
 	#end
 
-	public function initLuaShader(name:String)
+	public function initLuaShader(name:String, ignore:Bool = false)
 	{
-		if(!ClientPrefs.data.shaders) return false;
+		if(!ClientPrefs.data.shaders && !ignore) return false;
 
 		#if (!flash && sys)
 		if(runtimeShaders.exists(name))
